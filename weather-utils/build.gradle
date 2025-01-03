@@ -47,7 +47,7 @@ afterEvaluate {
             release(MavenPublication) {
                 from components.release
 
-                groupId = 'com.github.mohamedgharieb'
+                groupId = 'com.github.MohamedGharieb19'
                 artifactId = 'weather-utils'
                 version = '1.0.0'
 
