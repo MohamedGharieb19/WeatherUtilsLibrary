@@ -51,7 +51,7 @@ object DateFormatter {
         }
     }
 
-    private fun isToday(date: Date): Boolean {
+     fun isToday(date: Date): Boolean {
         val calendar = Calendar.getInstance(DEFAULT_TIMEZONE, DEFAULT_LOCALE)
         val today = Calendar.getInstance(DEFAULT_TIMEZONE, DEFAULT_LOCALE).apply {
             timeInMillis = calendar.timeInMillis
