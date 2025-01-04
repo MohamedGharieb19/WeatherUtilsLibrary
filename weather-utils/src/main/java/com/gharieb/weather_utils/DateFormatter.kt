@@ -1,37 +1,66 @@
 package com.gharieb.weather_utils
 
-import com.gharieb.weather_utils.DateUtils.isToday
+import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-object DateFormatter{
+object DateFormatter {
+    private val DEFAULT_LOCALE = Locale.US
+    private val DEFAULT_TIMEZONE = TimeZone.getTimeZone("UTC")
+
     fun formatDateToToday(dateString: String): String {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-        inputFormat.timeZone = TimeZone.getDefault()
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", DEFAULT_LOCALE).apply {
+            timeZone = DEFAULT_TIMEZONE
+        }
+        val outputFormat = SimpleDateFormat("hh:mm a", DEFAULT_LOCALE).apply {
+            timeZone = DEFAULT_TIMEZONE
+        }
 
-        val outputFormat = SimpleDateFormat("hh:mm a", Locale.getDefault())
-        outputFormat.timeZone = TimeZone.getDefault()
-
-        return if (isToday(dateString, inputFormat)) {
-            "Today: ${outputFormat.format(inputFormat.parse(dateString)!!)}"
-        } else {
-            dateString
+        return try {
+            val date = inputFormat.parse(dateString)
+            if (date != null && isToday(date)) {
+                "Today: ${outputFormat.format(date)}"
+            } else {
+                dateString
+            }
+        } catch (e: ParseException) {
+            dateString // Return the original string if parsing fails
         }
     }
 
     fun formatDateToDayOrToday(dateString: String): String {
-        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        inputFormat.timeZone = TimeZone.getDefault()
-
-        val dayFormat = SimpleDateFormat("EEEE", Locale.getDefault())
-        dayFormat.timeZone = TimeZone.getDefault()
-
-        return if (isToday(dateString, inputFormat)) {
-            "Today"
-        } else {
-            dayFormat.format(inputFormat.parse(dateString)!!)
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", DEFAULT_LOCALE).apply {
+            timeZone = DEFAULT_TIMEZONE
         }
+        val dayFormat = SimpleDateFormat("EEEE", DEFAULT_LOCALE).apply {
+            timeZone = DEFAULT_TIMEZONE
+        }
+
+        return try {
+            val date = inputFormat.parse(dateString)
+            if (date != null && isToday(date)) {
+                "Today"
+            } else {
+                dayFormat.format(date!!)
+            }
+        } catch (e: ParseException) {
+            dateString
+        }
+    }
+
+    private fun isToday(date: Date): Boolean {
+        val calendar = Calendar.getInstance(DEFAULT_TIMEZONE, DEFAULT_LOCALE)
+        val today = Calendar.getInstance(DEFAULT_TIMEZONE, DEFAULT_LOCALE).apply {
+            timeInMillis = calendar.timeInMillis
+        }
+        val target = Calendar.getInstance(DEFAULT_TIMEZONE, DEFAULT_LOCALE).apply {
+            time = date
+        }
+        return today.get(Calendar.YEAR) == target.get(Calendar.YEAR) &&
+                today.get(Calendar.DAY_OF_YEAR) == target.get(Calendar.DAY_OF_YEAR)
     }
 }
 
